@@ -6,7 +6,9 @@ var express = require('express'),
   resources = require('./../resources/model'),
   converter = require('./../middleware/converter'),
   cors = require('cors'),
-  bodyParser = require('body-parser');
+  bodyParser = require('body-parser'),
+  path = require('path');
+
 
 var app = express();
 
@@ -19,7 +21,7 @@ app.use('/pi/sensors', sensorRoutes);
 app.use('/things', thingsRoutes);
 
 app.get('/pi', function (req, res) {
-  res.send('This is the WoT-Pi!')
+	res.sendFile(path.join(__dirname + './../public/pi_sensor_webpage.html'));
 });
 
 // For representation design

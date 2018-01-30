@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ex 2.1 - Polling Temperature</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+    <style>
+    .switch {
+  position: relative;
+  display: inline-block;
+  width: 90px;
+  height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ca2222;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2ab934;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(55px);
+  -ms-transform: translateX(55px);
+  transform: translateX(55px);
+}
+
+/*------ ADDED CSS ---------*/
+.on
+{
+  display: none;
+}
+
+.on, .off
+{
+  color: white;
+  position: absolute;
+  transform: translate(-50%,-50%);
+  top: 50%;
+  left: 50%;
+  font-size: 10px;
+  font-family: Verdana, sans-serif;
+}
+
+input:checked+ .slider .on
+{display: block;}
+
+input:checked + .slider .off
+{display: none;}
+
+/*--------- END --------*/
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;}
+  </style>
+</head>
+<body>
+  <h1>Current temperature</h1>
+
+  <h2 id='temp'></h2>
+
+  <h4>Choose your unit</h4>
+  <figure>
+    <img onclick="changeToF()" src="https://res.cloudinary.com/dk-find-out/image/upload/q_80,w_1920,f_auto/A-Carolina-Pontes-Daniel-Fahrenheit_zljtwo.jpg" width="100">
+    <figcaption> Farenheit </figcaption>
+  </figure>
+
+  <figure>
+  <img onclick="changeToC()" src="https://upload.wikimedia.org/wikipedia/commons/8/81/Headshot_of_Anders_Celsius.jpg" width="100">
+  <figcaption> Celsius </figcaption>
+</figure>
+
+
+
+
+  <h1>Presence Detection</h1>
+  <h2 id='pir'></h2>
+
+  <h1>LED</h1>
+
+  <img id="myImage" onclick="changeImage()" src="http://www.w3schools.com/js/pic_bulboff.gif" width="100" height="180">
+
+<script>
+
+$(document).ready( //#A
+  function doPoll() {
+
+    $.getJSON('http://10.10.110.12:8484/pi/sensors/pir', //#B
+      function (data) { //#C
+        console.log(data);
+
+        if(data.value == true) {
+                $('#pir').html('who goes there!?'); //#D
+        }
+        else {
+                $('#pir').html('Im so lonely'); //#D
+        }
+
+    });
+
+    setTimeout(doPoll, 1000); //#E
+  });
+
+$.putJSON = function(url, data, callback) {
+    return jQuery.ajax({
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    'type': 'PUT',
+    'url': url,
+    'data': JSON.stringify(data),
+    'dataType': 'json',
+'success': callback
+});
+};
+
+
+
+function cToF(celsius)
+{
+var cTemp = celsius;
+var cToFahr = cTemp * 9 / 5 + 32;
+return Math.round(cToFahr * 100) / 100
+}
+
+function changeImage() {
+    var image = document.getElementById('myImage');
+    if(image.src.match("bulbon")) {
+            image.src = "http://www.w3schools.com/js/pic_bulboff.gif";
+            $.putJSON('http://10.10.110.12:8484/pi/actuators/leds/1/', { 'value': false }, );
+    } else {
+            image.src = "http://www.w3schools.com/js/pic_bulbon.gif";
+            $.putJSON('http://10.10.110.12:8484/pi/actuators/leds/1/', { 'value': true }, );
+    }
+    };
+
+function changeToC() {
+  $.getJSON('http://10.10.110.12:8484/pi/sensors/temperature', //#B
+    function (data) { //#C
+      console.log(data);
+
+      $('#temp').html(data.value + ' Celsius');
+    });
+}
+
+function changeToF() {
+  $.getJSON('http://10.10.110.12:8484/pi/sensors/temperature', //#B
+    function (data) { //#C
+      console.log(data);
+
+
+      $('#temp').html(cToF(data.value) + ' Farenheit'); //#D
+    });
+}
+
+
+//#A Wait until the page is loaded and then call doPoll()
+//#B Use the AJAX helper to get the JSON payload from the temperature sensor
+//#C When the response arrives, this function is called
+//#D Select the "temp" HTML element and update its content using the data.value (the value) and data.unit (the unit) returned in the JSON payload
+//#E The doPoll() function sets a timer to call itself again in 5 secods (5000 milliseconds)
+</script>
+
