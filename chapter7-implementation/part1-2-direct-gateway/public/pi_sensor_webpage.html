@@ -123,7 +123,7 @@ input:checked + .slider .off
 $(document).ready( //#A
   function doPoll() {
 
-    $.getJSON('http://10.10.110.12:8484/pi/sensors/pir', //#B
+    $.getJSON('http://192.168.1.108:8484/pi/sensors/pir', //#B
       function (data) { //#C
         console.log(data);
 
@@ -166,15 +166,15 @@ function changeImage() {
     var image = document.getElementById('myImage');
     if(image.src.match("bulbon")) {
             image.src = "http://www.w3schools.com/js/pic_bulboff.gif";
-            $.putJSON('http://10.10.110.12:8484/pi/actuators/leds/1/', { 'value': false }, );
+            $.putJSON('http://192.168.1.108:8484/pi/actuators/leds/1/', { 'value': false }, );
     } else {
             image.src = "http://www.w3schools.com/js/pic_bulbon.gif";
-            $.putJSON('http://10.10.110.12:8484/pi/actuators/leds/1/', { 'value': true }, );
+            $.putJSON('http://192.168.1.108:8484/pi/actuators/leds/1/', { 'value': true }, );
     }
     };
 
 function changeToC() {
-  $.getJSON('http://10.10.110.12:8484/pi/sensors/temperature', //#B
+  $.getJSON('http://192.168.1.108:8484/pi/sensors/temperature', //#B
     function (data) { //#C
       console.log(data);
 
@@ -183,7 +183,7 @@ function changeToC() {
 }
 
 function changeToF() {
-  $.getJSON('http://10.10.110.12:8484/pi/sensors/temperature', //#B
+  $.getJSON('http://192.168.1.108:8484/pi/sensors/temperature', //#B
     function (data) { //#C
       console.log(data);
 
